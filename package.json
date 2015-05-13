@@ -1,0 +1,15 @@
+{
+  "name": "embedded-project",
+  "version": "1.0.0",
+  "description": "Autonomous Bebop drone. UC Denver CSCI 4287",
+  "repository": "https://github.com/spencersteers/embedded-project",
+  "main": "main.js",
+  "dependencies": {
+    "bluebird": "^2.9.25",
+    "keypress": "^0.2.1",
+    "lodash": "^3.8.0",
+    "node-bebop": "^0.2.0",
+    "yargs": "^3.8.0"
+  },
+  "devDependencies": {}
+}
