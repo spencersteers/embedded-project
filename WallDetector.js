@@ -60,7 +60,7 @@ var WallDetection = _.assign({}, EventEmitter.prototype, {
 });
 
 if (argv.pi) {
-  var usonic = sonic.createSensor(23, 18, 999);
+  var sensor = usonic.createSensor(23, 18, 999);
 
   setInterval(function() {
     var distance = sensor();
