@@ -95,8 +95,8 @@ else {
   keypress(process.stdin);
   process.stdin.on('keypress', function (ch, key) {
     if (!argv.pi) {
-      if (key && !key.ctrl && key.name == 'o') {
-        var distance = 40;
+      if (key && key.name == 'o') {
+        var distance = 30;
         if (distance < 40) {
           currentDistance = distance;
           WallDetection.emitWallStateChange();
@@ -108,7 +108,7 @@ else {
           WallDetection.emitWallNone();
         }
       }
-      if (key && key.ctrl && key.name == 'o') {
+      if (key && key.name == 'p') {
         var distance = 60;
         if (distance < 40) {
           currentDistance = distance;

@@ -9,7 +9,7 @@ var EventEmitter = require('events').EventEmitter;
 var Promise = require('bluebird');
 
 printControls();
-var speed = 10;
+var speed = 8;
 var leftSpeed = 7;
 var inAutonomousFlight = false;
 var drone = bebop.createClient();
@@ -39,80 +39,12 @@ var STATE_WALL_RIGHT = false;
 // connect
 console.log("connecting to drone...");
 drone.connect(function() {
-
+  
 });
-
-
 
 function resetDroneSpeed() {
   drone.stop();
   // drone.left(leftSpeed);
-}
-
-// Silly autonomous flight
-// function startAutonomousFlight() {
-//   if (inAutonomousFlight) {
-//     return;
-//   }
-//   console.log('starting autonomous flight');
-//   // drone.flatTrim();
-//   inAutonomousFlight = true;
-//   drone.takeOff();
-
-//   setTimeout(function() {
-//     drone.left(leftSpeed);
-//   }, 1500);
-
-//   setTimeout(function() {
-//     drone.forward(speed);
-//   }, 3000);
-
-//   setTimeout(function() {
-//     drone.stop();
-//     drone.left(leftSpeed);
-//   }, 5000);
-
-//   setTimeout(function() {
-//     drone.left(leftSpeed + 5);
-//   }, 6000)
-
-//   setTimeout(function() {
-//     drone.stop();
-//   }, 7000);
-
-//   setTimeout(function() {
-//     drone.left(leftSpeed);
-//     drone.forward(speed);
-//   }, 8000);
-
-//   setTimeout(function() {
-//     drone.left(leftSpeed);
-//     drone.forward(speed);
-//   }, 10000);
-
-//   setTimeout(function() {
-//     drone.land();
-//     inAutonomousFlight = false;
-//   }, 10500);
-// }
-
-function onWallStateChange(state) {
-  if (state.wallPosition == "f") {
-    resetDroneSpeed();
-    drone.back(speed);    
-  }
-  if (state.wallPosition = "r") {
-    resetDroneSpeed();
-    drone.left(leftSpeed + speed);
-  }
-  if (state.wallPosition = "l") {
-    resetDroneSpeed();
-    drone.right(speed);
-  }
-  if (state.wallPosition = "b") {
-    resetDroneSpeed();
-    drone.forward(speed);
-  }
 }
 
 function quickBackward() {
@@ -151,13 +83,16 @@ var goingRight = false;
 WallDetector.addWallNoneListener(function(distance) {
   console.log("none:", distance)
   if (goingRight) {
-    goingRight = false;
     console.log("stoping right");
+    goingRight = false;
     drone.stop();
-    drone.forward(speed);
-
+    drone.left(5);
+    setTimeout(function() {
+      drone.forward(speed);
+    }, 1000);
   }
   else {
+    drone.left(5);
     drone.forward(speed);
   }
 });
@@ -165,13 +100,12 @@ WallDetector.addWallNoneListener(function(distance) {
 WallDetector.addWallInFrontListener(function(distance) {
   console.log("front:", distance)
   if (goingRight) {
-    // drone.right(speed);
+    drone.right(speed);
   }
   else {
     goingRight = true;
     console.log("stoping forward");
-    quickBackward();
-
+    drone.stop();
     setTimeout(function() {
       drone.right(speed);
     }, 1000);
@@ -203,7 +137,6 @@ if (!IS_TEST) {
     else if (key && key.name == 't') {
       drone.takeOff();
     }
-
 
     else if (key && key.ctrl && key.name == 'w') {
       // resetDroneSpeed();
@@ -264,4 +197,68 @@ function printControls() {
   console.log();
 }
 
+// Silly autonomous flight
+// function startAutonomousFlight() {
+//   if (inAutonomousFlight) {
+//     return;
+//   }
+//   console.log('starting autonomous flight');
+//   // drone.flatTrim();
+//   inAutonomousFlight = true;
+//   drone.takeOff();
 
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//   }, 1500);
+
+//   setTimeout(function() {
+//     drone.forward(speed);
+//   }, 3000);
+
+//   setTimeout(function() {
+//     drone.stop();
+//     drone.left(leftSpeed);
+//   }, 5000);
+
+//   setTimeout(function() {
+//     drone.left(leftSpeed + 5);
+//   }, 6000)
+
+//   setTimeout(function() {
+//     drone.stop();
+//   }, 7000);
+
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//     drone.forward(speed);
+//   }, 8000);
+
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//     drone.forward(speed);
+//   }, 10000);
+
+//   setTimeout(function() {
+//     drone.land();
+//     inAutonomousFlight = false;
+//   }, 10500);
+// }
+
+// function onWallStateChange(state) {
+//   if (state.wallPosition == "f") {
+//     resetDroneSpeed();
+//     drone.back(speed);    
+//   }
+//   if (state.wallPosition = "r") {
+//     resetDroneSpeed();
+//     drone.left(leftSpeed + speed);
+//   }
+//   if (state.wallPosition = "l") {
+//     resetDroneSpeed();
+//     drone.right(speed);
+//   }
+//   if (state.wallPosition = "b") {
+//     resetDroneSpeed();
+//     drone.forward(speed);
+//   }
+// }
