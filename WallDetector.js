@@ -68,12 +68,12 @@ if (argv.pi) {
     if (distance == -1) {
       console.log("sensor not reading");
     }
-    else if (distance < 50) {
+    else if (distance < 40) {
       currentDistance = distance;
       WallDetection.emitWallStateChange();
       WallDetection.emitWallInFront();
     }
-    else if (distance >= 50) {
+    else if (distance >= 40) {
       currentDistance = distance;
       WallDetection.emitWallStateChange();
       WallDetection.emitWallNone();
@@ -97,12 +97,12 @@ else {
     if (!argv.pi) {
       if (key && !key.ctrl && key.name == 'o') {
         var distance = 40;
-        if (distance < 50) {
+        if (distance < 40) {
           currentDistance = distance;
           WallDetection.emitWallStateChange();
           WallDetection.emitWallInFront();
         }
-        else if (distance >= 50) {
+        else if (distance >= 40) {
           currentDistance = distance;
           WallDetection.emitWallStateChange();
           WallDetection.emitWallNone();
@@ -110,12 +110,12 @@ else {
       }
       if (key && key.ctrl && key.name == 'o') {
         var distance = 60;
-        if (distance < 50) {
+        if (distance < 40) {
           currentDistance = distance;
           WallDetection.emitWallStateChange();
           WallDetection.emitWallInFront();
         }
-        else if (distance >= 50) {
+        else if (distance >= 40) {
           currentDistance = distance;
           WallDetection.emitWallStateChange();
           WallDetection.emitWallNone();

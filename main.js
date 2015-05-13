@@ -151,10 +151,10 @@ var goingRight = false;
 WallDetector.addWallNoneListener(function(distance) {
   console.log("none:", distance)
   if (goingRight) {
+    goingRight = false;
     console.log("stoping right");
     drone.stop();
     drone.forward(speed);
-    goingRight = false;
 
   }
   else {
@@ -168,8 +168,8 @@ WallDetector.addWallInFrontListener(function(distance) {
     // drone.right(speed);
   }
   else {
-    console.log("stoping forward");
     goingRight = true;
+    console.log("stoping forward");
     quickBackward();
 
     setTimeout(function() {
