@@ -9,7 +9,7 @@ var EventEmitter = require('events').EventEmitter;
 var Promise = require('bluebird');
 
 printControls();
-var speed = 3;
+var speed = 10;
 var leftSpeed = 7;
 var inAutonomousFlight = false;
 var drone = bebop.createClient();
@@ -37,62 +37,65 @@ var STATE_WALL_FRONT = false;
 var STATE_WALL_RIGHT = false;
 
 // connect
-console.log("connecting to drone...");
-drone.connect(function() {
+if (!IS_TEST) {
+  console.log("connecting to drone...");
+  drone.connect(function() {
 
-});
+  });
+}
+
 
 function resetDroneSpeed() {
   drone.stop();
-  drone.left(leftSpeed);
+  // drone.left(leftSpeed);
 }
 
 // Silly autonomous flight
-function startAutonomousFlight() {
-  if (inAutonomousFlight) {
-    return;
-  }
-  console.log('starting autonomous flight');
-  // drone.flatTrim();
-  inAutonomousFlight = true;
-  drone.takeOff();
+// function startAutonomousFlight() {
+//   if (inAutonomousFlight) {
+//     return;
+//   }
+//   console.log('starting autonomous flight');
+//   // drone.flatTrim();
+//   inAutonomousFlight = true;
+//   drone.takeOff();
 
-  setTimeout(function() {
-    drone.left(leftSpeed);
-  }, 1500);
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//   }, 1500);
 
-  setTimeout(function() {
-    drone.forward(speed);
-  }, 3000);
+//   setTimeout(function() {
+//     drone.forward(speed);
+//   }, 3000);
 
-  setTimeout(function() {
-    drone.stop();
-    drone.left(leftSpeed);
-  }, 5000);
+//   setTimeout(function() {
+//     drone.stop();
+//     drone.left(leftSpeed);
+//   }, 5000);
 
-  setTimeout(function() {
-    drone.left(leftSpeed + 5);
-  }, 6000)
+//   setTimeout(function() {
+//     drone.left(leftSpeed + 5);
+//   }, 6000)
 
-  setTimeout(function() {
-    drone.stop();
-  }, 7000);
+//   setTimeout(function() {
+//     drone.stop();
+//   }, 7000);
 
-  setTimeout(function() {
-    drone.left(leftSpeed);
-    drone.forward(speed);
-  }, 8000);
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//     drone.forward(speed);
+//   }, 8000);
 
-  setTimeout(function() {
-    drone.left(leftSpeed);
-    drone.forward(speed);
-  }, 10000);
+//   setTimeout(function() {
+//     drone.left(leftSpeed);
+//     drone.forward(speed);
+//   }, 10000);
 
-  setTimeout(function() {
-    drone.land();
-    inAutonomousFlight = false;
-  }, 10500);
-}
+//   setTimeout(function() {
+//     drone.land();
+//     inAutonomousFlight = false;
+//   }, 10500);
+// }
 
 function onWallStateChange(state) {
   if (state.wallPosition == "f") {
@@ -113,9 +116,47 @@ function onWallStateChange(state) {
   }
 }
 
-var WallDetector = require('./WallDetector');
-WallDetector.addChangeListener(onWallStateChange)
 
+
+var WallDetector = require('./WallDetector');
+// WallDetector.addChangeListener(onWallStateChange)
+
+WallDetector.addWallNoneListener(function(distance) {
+  console.log('none:', distance);
+});
+
+WallDetector.addWallInFrontListener(function(distance) {
+  console.log('infront:', distance);
+});
+
+
+function quickBackward() {
+  drone.backward(speed)
+  setTimeout(function () {
+    drone.stop();
+  }, 500)
+}
+
+function quickLeft() {
+  drone.left(speed)
+  setTimeout(function () {
+    drone.stop();
+  }, 500)
+}
+
+function quickRight() {
+  drone.right(speed)
+  setTimeout(function () {
+    drone.stop();
+  }, 500)
+}
+
+function quickForward() {
+  drone.forward(speed)
+  setTimeout(function () {
+    drone.stop();
+  }, 500)
+}
 
 
 if (!IS_TEST) {
@@ -123,8 +164,6 @@ if (!IS_TEST) {
   // Keyboard controls
   keypress(process.stdin);
   process.stdin.on('keypress', function (ch, key) {
-    
-
     if (key && key.ctrl && key.name == 'c') {
       drone.emergency();
       process.exit();
@@ -140,25 +179,42 @@ if (!IS_TEST) {
     }
     else if (key && key.name == 't') {
       drone.takeOff();
-      setTimeout(function() {
-        drone.down(2);
-      }, 2000);
     }
-    else if (key && key.name == 'up') {
-      resetDroneSpeed();
+
+
+    else if (key && key.ctrl && key.name == 'w') {
+      // resetDroneSpeed();
       drone.forward(speed);
     }
-    else if (key && key.name == 'left') {
-      resetDroneSpeed();
-      drone.left(10);
+    else if (key && key.ctrl && key.name == 'a') {
+      // resetDroneSpeed();
+      drone.left(speed);
     }
-    else if (key && key.name == 'right') {
-      resetDroneSpeed();
-      drone.right(10);
+    else if (key && key.ctrl && key.name == 'd') {
+      // resetDroneSpeed();
+      drone.right(speed);
+    }
+    else if (key && key.ctrl && key.name == 's') {
+      // resetDroneSpeed();
+      drone.backward(speed);
+    }
+    else if (key && key.name == 'w') {
+      // resetDroneSpeed();
+      quickForward(speed);
     }
     else if (key && key.name == 'a') {
-      startAutonomousFlight();
+      // resetDroneSpeed();
+      quickLeft(speed);
     }
+    else if (key && key.name == 'd') {
+      // resetDroneSpeed();
+      quickRight(speed);
+    }
+    else if (key && key.name == 's') {
+      // resetDroneSpeed();
+      quickBackward(speed);
+    }
+
     else if (key && key.name == 'f') {
       drone.flatTrim()
       console.log('sendingFlatTrim');
@@ -169,8 +225,6 @@ if (!IS_TEST) {
   });
   process.stdin.setRawMode(true);
   process.stdin.resume();
-
-
 }
 
 function printControls() {

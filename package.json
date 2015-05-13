@@ -9,6 +9,7 @@
     "keypress": "^0.2.1",
     "lodash": "^3.8.0",
     "node-bebop": "^0.2.0",
+    "r-pi-usonic": "^2.4.1",
     "yargs": "^3.8.0"
   },
   "devDependencies": {}
