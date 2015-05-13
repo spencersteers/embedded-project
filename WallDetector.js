@@ -1,7 +1,6 @@
 var argv = require('yargs').argv;
 var keypress = require('keypress');
 var EventEmitter = require('events').EventEmitter;
-var usonic = require('r-pi-usonic');
 var _ = require('lodash');
 
 
@@ -60,6 +59,7 @@ var WallDetection = _.assign({}, EventEmitter.prototype, {
 });
 
 if (argv.pi) {
+  var usonic = require('r-pi-usonic');
   var sensor = usonic.createSensor(23, 18, 999);
 
   setInterval(function() {
@@ -68,12 +68,12 @@ if (argv.pi) {
     if (distance == -1) {
       console.log("sensor not reading");
     }
-    else if (distance < 40) {
+    else if (distance < 50) {
       currentDistance = distance;
       WallDetection.emitWallStateChange();
       WallDetection.emitWallInFront();
     }
-    else if (distance >= 40) {
+    else if (distance >= 50) {
       currentDistance = distance;
       WallDetection.emitWallStateChange();
       WallDetection.emitWallNone();
@@ -91,28 +91,35 @@ else {
       currentState.wallDistance = 10;
     }
   }
+  
   keypress(process.stdin);
   process.stdin.on('keypress', function (ch, key) {
     if (!argv.pi) {
-      if (key && key.name == 'w') {
-        toggleState('f');
-        WallDetection.emitWallStateChange();
-        console.log("current state", currentState);
+      if (key && key.name == 'o') {
+        var distance = 40;
+        if (distance < 50) {
+          currentDistance = distance;
+          WallDetection.emitWallStateChange();
+          WallDetection.emitWallInFront();
+        }
+        else if (distance >= 50) {
+          currentDistance = distance;
+          WallDetection.emitWallStateChange();
+          WallDetection.emitWallNone();
+        }
       }
-      else if (key && key.name == 'd') {
-        toggleState('r');
-        WallDetection.emitWallStateChange();
-        console.log("current state", currentState);
-      }
-      else if (key && key.name == 's') {
-        toggleState('b');
-        WallDetection.emitWallStateChange();
-        console.log("current state", currentState);
-      }
-      else if (key && key.name == 'a') {
-        toggleState('l');
-        WallDetection.emitWallStateChange();
-        console.log("current state", currentState);
+      if (key && key.ctrl && key.name == 'o') {
+        var distance = 60;
+        if (distance < 50) {
+          currentDistance = distance;
+          WallDetection.emitWallStateChange();
+          WallDetection.emitWallInFront();
+        }
+        else if (distance >= 50) {
+          currentDistance = distance;
+          WallDetection.emitWallStateChange();
+          WallDetection.emitWallNone();
+        }
       }
     }
   });

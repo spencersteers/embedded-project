@@ -37,12 +37,11 @@ var STATE_WALL_FRONT = false;
 var STATE_WALL_RIGHT = false;
 
 // connect
-if (!IS_TEST) {
-  console.log("connecting to drone...");
-  drone.connect(function() {
+console.log("connecting to drone...");
+drone.connect(function() {
 
-  });
-}
+});
+
 
 
 function resetDroneSpeed() {
@@ -116,20 +115,6 @@ function onWallStateChange(state) {
   }
 }
 
-
-
-var WallDetector = require('./WallDetector');
-// WallDetector.addChangeListener(onWallStateChange)
-
-WallDetector.addWallNoneListener(function(distance) {
-  console.log('none:', distance);
-});
-
-WallDetector.addWallInFrontListener(function(distance) {
-  console.log('infront:', distance);
-});
-
-
 function quickBackward() {
   drone.backward(speed)
   setTimeout(function () {
@@ -157,6 +142,42 @@ function quickForward() {
     drone.stop();
   }, 500)
 }
+
+
+var WallDetector = require('./WallDetector');
+// WallDetector.addChangeListener(onWallStateChange)
+
+var goingRight = false;
+WallDetector.addWallNoneListener(function(distance) {
+  console.log("none:", distance)
+  if (goingRight) {
+    drone.stop();
+    drone.forward(speed);
+    goingRight = false;
+
+  }
+  else {
+    drone.forward(speed);
+  }
+});
+
+WallDetector.addWallInFrontListener(function(distance) {
+  console.log("front:", distance)
+  if (goingRight) {
+    drone.right(speed);
+  }
+  else {
+    goingRight = true;
+    drone.quickBackward();
+
+    setTimeout(function() {
+      drone.right(speed);
+    }, 1000);
+  }
+});
+
+
+
 
 
 if (!IS_TEST) {
