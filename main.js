@@ -2,7 +2,11 @@ var argv = require('yargs').argv;
 var bebop = require('node-bebop');
 var keypress = require('keypress');
 
+
+// base variables
 var speed = 10;
+// when calling reset these values will be used
+// for initial spped. use to remove drifting
 var forwardSpeedCalibration = 0;
 var backwardSpeedCalibration = 0;
 var leftSpeedCalibration = 0;
@@ -10,7 +14,6 @@ var rightSpeedCalibration = 0;
 
 
 var drone = bebop.createClient();
-
 
 // drone events
 drone.on('ready', function() {
@@ -29,155 +32,136 @@ drone.on('hovering', function() {
   console.log('drone hovering');
 });
 
-var STATE_WALL_FRONT = false;
-var STATE_WALL_RIGHT = false;
-
-// connect
-console.log("connecting to drone...");
-drone.connect(function() {
-  
-});
-
 function resetDroneSpeed() {
   drone.stop();
-  // drone.left(leftSpeedCalibration);
+  drone.forward(forwardSpeedCalibration);
+  drone.backward(backwardSpeedCalibration);
+  drone.left(leftSpeedCalibration);
+  drone.right(rightSpeedCalibration);
 }
 
+// set a speed and stop;
 function quickBackward() {
   drone.backward(speed)
   setTimeout(function () {
-    drone.stop();
+    resetDroneSpeed();
   }, 500)
 }
 
 function quickLeft() {
   drone.left(speed)
   setTimeout(function () {
-    drone.stop();
+    resetDroneSpeed();
   }, 500)
 }
 
 function quickRight() {
   drone.right(speed)
   setTimeout(function () {
-    drone.stop();
+    resetDroneSpeed();
   }, 500)
 }
 
 function quickForward() {
   drone.forward(speed)
   setTimeout(function () {
-    drone.stop();
+    resetDroneSpeed();
   }, 500)
 }
 
-
+// Detector events
 var WallDetector = require('./WallDetector');
-// WallDetector.addChangeListener(onWallStateChange)
-
 var goingRight = false;
 WallDetector.addWallNoneListener(function(distance) {
-  console.log("none:", distance)
   if (goingRight) {
     console.log("stoping right");
     goingRight = false;
-    drone.stop();
-    drone.left(5);
+    resetDroneSpeed()
     setTimeout(function() {
       drone.forward(speed);
-    }, 1000);
+    }, 2000);
   }
   else {
-    drone.left(5);
     drone.forward(speed);
   }
 });
 
 WallDetector.addWallInFrontListener(function(distance) {
-  console.log("front:", distance)
   if (goingRight) {
     drone.right(speed);
   }
   else {
-    goingRight = true;
     console.log("stoping forward");
-    drone.stop();
+    goingRight = true;
+    resetDroneSpeed();
     setTimeout(function() {
       drone.right(speed);
-    }, 1000);
+    }, 2000);
   }
 });
 
+// Keyboard controls
+keypress(process.stdin);
+process.stdin.on('keypress', function (ch, key) {
+  if (key && key.ctrl && key.name == 'c') {
+    drone.emergency();
+    process.exit();
+  }
+  else if (key && key.name == 'escape') {
+    drone.emergency();
+  }
+  else if (key && key.name == 'space') {
+    drone.stop();
+  }
+  else if (key && key.name == 'l') {
+    drone.land();
+  }
+  else if (key && key.name == 't') {
+    drone.takeOff();
+  }
+  else if (key && key.ctrl && key.name == 'w') {
+    // resetDroneSpeed();
+    drone.forward(speed);
+  }
+  else if (key && key.ctrl && key.name == 'a') {
+    // resetDroneSpeed();
+    drone.left(speed);
+  }
+  else if (key && key.ctrl && key.name == 'd') {
+    // resetDroneSpeed();
+    drone.right(speed);
+  }
+  else if (key && key.ctrl && key.name == 's') {
+    // resetDroneSpeed();
+    drone.backward(speed);
+  }
+  else if (key && key.name == 'w') {
+    // resetDroneSpeed();
+    quickForward(speed);
+  }
+  else if (key && key.name == 'a') {
+    // resetDroneSpeed();
+    quickLeft(speed);
+  }
+  else if (key && key.name == 'd') {
+    // resetDroneSpeed();
+    quickRight(speed);
+  }
+  else if (key && key.name == 's') {
+    // resetDroneSpeed();
+    quickBackward(speed);
+  }
+  else if (key && key.name == 'f') {
+    drone.flatTrim()
+    console.log('sendingFlatTrim');
+  }
+  else if (key && key.name == 'h') {
+    printControls();
+  }
+});
+process.stdin.setRawMode(true);
+process.stdin.resume();
 
-
-
-
-if (!argv.test;) {
-
-  // Keyboard controls
-  keypress(process.stdin);
-  process.stdin.on('keypress', function (ch, key) {
-    if (key && key.ctrl && key.name == 'c') {
-      drone.emergency();
-      process.exit();
-    }
-    else if (key && key.name == 'escape') {
-      drone.emergency();
-    }
-    else if (key && key.name == 'space') {
-      drone.stop();
-    }
-    else if (key && key.name == 'l') {
-      drone.land();
-    }
-    else if (key && key.name == 't') {
-      drone.takeOff();
-    }
-
-    else if (key && key.ctrl && key.name == 'w') {
-      // resetDroneSpeed();
-      drone.forward(speed);
-    }
-    else if (key && key.ctrl && key.name == 'a') {
-      // resetDroneSpeed();
-      drone.left(speed);
-    }
-    else if (key && key.ctrl && key.name == 'd') {
-      // resetDroneSpeed();
-      drone.right(speed);
-    }
-    else if (key && key.ctrl && key.name == 's') {
-      // resetDroneSpeed();
-      drone.backward(speed);
-    }
-    else if (key && key.name == 'w') {
-      // resetDroneSpeed();
-      quickForward(speed);
-    }
-    else if (key && key.name == 'a') {
-      // resetDroneSpeed();
-      quickLeft(speed);
-    }
-    else if (key && key.name == 'd') {
-      // resetDroneSpeed();
-      quickRight(speed);
-    }
-    else if (key && key.name == 's') {
-      // resetDroneSpeed();
-      quickBackward(speed);
-    }
-
-    else if (key && key.name == 'f') {
-      drone.flatTrim()
-      console.log('sendingFlatTrim');
-    }
-    else if (key && key.name == 'h') {
-      printControls();
-    }
-  });
-  process.stdin.setRawMode(true);
-  process.stdin.resume();
-}
 
 function printControls() {
   console.log('Usage')
@@ -185,10 +169,15 @@ function printControls() {
   console.log('space:      stop');
   console.log('l:          land');
   console.log('t:          takeOff');
-  console.log('up:         forward');
-  console.log('left:       left');
+  console.log('w:          forward');
+  console.log('d:          right');
+  console.log('a:          left');
+  console.log('s:          backward');
   console.log('f:          flattrim');
-  console.log('a:          start autonomous flight');
+  if (!argv.pi) {
+    console.log('o:          simulate wall in front');
+    console.log('p:          simulate no wall');
+  }
   console.log('h:          help');
   console.log();
 }
