@@ -13,7 +13,15 @@ var leftSpeedCalibration = 0;
 var rightSpeedCalibration = 0;
 
 
+
 var drone = bebop.createClient();
+printControls();
+// connect
+console.log("connecting to drone...");
+drone.connect(function() {
+    
+});
+
 
 // drone events
 drone.on('ready', function() {

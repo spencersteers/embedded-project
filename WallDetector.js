@@ -48,11 +48,11 @@ if (argv.pi) {
     }
     else if (distance < this.distanceThreshold) {
       currentDistance = distance;
-      WallDetection.emitWallInFront();
+      WallDetector.emitWallInFront();
     }
     else if (distance >= this.distanceThreshold) {
       currentDistance = distance;
-      WallDetection.emitWallNone();
+      WallDetector.emitWallNone();
     }
   }, 1000);
 }
@@ -62,11 +62,11 @@ else {
     if (!argv.pi) {
       if (key && key.name == 'o') {
         currentDistance = distanceThreshold - 10;
-        WallDetection.emitWallInFront();
+        WallDetector.emitWallInFront();
       }
       if (key && key.name == 'p') {
         currentDistance = distanceThreshold + 10;
-        WallDetection.emitWallNone();
+        WallDetector.emitWallNone();
       }
     }
   });
