@@ -1,20 +1,16 @@
-/// <reference path="typings/node/node.d.ts"/>
-'use strict';
-
 var argv = require('yargs').argv;
 var bebop = require('node-bebop');
 var keypress = require('keypress');
-var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
-var Promise = require('bluebird');
 
-printControls();
-var speed = 8;
-var leftSpeed = 7;
-var inAutonomousFlight = false;
+var speed = 10;
+var forwardSpeedCalibration = 0;
+var backwardSpeedCalibration = 0;
+var leftSpeedCalibration = 0;
+var rightSpeedCalibration = 0;
+
+
 var drone = bebop.createClient();
 
-var IS_TEST = argv.test;
 
 // drone events
 drone.on('ready', function() {
@@ -44,7 +40,7 @@ drone.connect(function() {
 
 function resetDroneSpeed() {
   drone.stop();
-  // drone.left(leftSpeed);
+  // drone.left(leftSpeedCalibration);
 }
 
 function quickBackward() {
@@ -116,7 +112,7 @@ WallDetector.addWallInFrontListener(function(distance) {
 
 
 
-if (!IS_TEST) {
+if (!argv.test;) {
 
   // Keyboard controls
   keypress(process.stdin);
@@ -208,7 +204,7 @@ function printControls() {
 //   drone.takeOff();
 
 //   setTimeout(function() {
-//     drone.left(leftSpeed);
+//     drone.left(leftSpeedCalibration);
 //   }, 1500);
 
 //   setTimeout(function() {
@@ -217,11 +213,11 @@ function printControls() {
 
 //   setTimeout(function() {
 //     drone.stop();
-//     drone.left(leftSpeed);
+//     drone.left(leftSpeedCalibration);
 //   }, 5000);
 
 //   setTimeout(function() {
-//     drone.left(leftSpeed + 5);
+//     drone.left(leftSpeedCalibration + 5);
 //   }, 6000)
 
 //   setTimeout(function() {
@@ -229,12 +225,12 @@ function printControls() {
 //   }, 7000);
 
 //   setTimeout(function() {
-//     drone.left(leftSpeed);
+//     drone.left(leftSpeedCalibration);
 //     drone.forward(speed);
 //   }, 8000);
 
 //   setTimeout(function() {
-//     drone.left(leftSpeed);
+//     drone.left(leftSpeedCalibration);
 //     drone.forward(speed);
 //   }, 10000);
 
@@ -251,7 +247,7 @@ function printControls() {
 //   }
 //   if (state.wallPosition = "r") {
 //     resetDroneSpeed();
-//     drone.left(leftSpeed + speed);
+//     drone.left(leftSpeedCalibration + speed);
 //   }
 //   if (state.wallPosition = "l") {
 //     resetDroneSpeed();
